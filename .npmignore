@@ -1,7 +1,14 @@
 .github/
+.idea/
 .vscode/
+scripts/
 test/
+src/
 
-.editorconfig
+
 .gitignore
 .npmignore
+.nvmrc
+biome.json
+renovate.json
+rollup.config.js

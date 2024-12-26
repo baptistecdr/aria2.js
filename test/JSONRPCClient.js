@@ -1,10 +1,5 @@
 import test from "ava";
-import fetch from "node-fetch";
-import WebSocket from "ws";
-
 import JSONRPCClient from "../src/JSONRPCClient.js";
-
-Object.assign(global, { fetch, WebSocket });
 
 test("#id", (t) => {
   const client = new JSONRPCClient();
@@ -23,9 +18,9 @@ test("#url", (t) => {
         port: 1234,
         path: "/foobar",
       },
-      "foo"
+      "foo",
     ),
-    "foos://foobar:1234/foobar"
+    "foos://foobar:1234/foobar",
   );
 });
 
@@ -66,9 +61,10 @@ test("#websocket error", async (t) => {
   }
 });
 
-test.cb("#websocket json error", (t) => {
+test("#websocket json error", (t) => {
   const client = new JSONRPCClient();
 
+  // biome-ignore lint/complexity/useArrowFunction: Arrow functions cannot be used as constructors
   client.WebSocket = function () {
     return {};
   };
@@ -77,14 +73,13 @@ test.cb("#websocket json error", (t) => {
 
   client.on("error", (err) => {
     t.true(err instanceof SyntaxError);
-    t.is(err.message, "Unexpected token o in JSON at position 1");
-    t.end();
+    t.is(err.message, "Unexpected token 'o', \"foo\" is not valid JSON");
   });
 
   client.socket.onmessage({ data: "foo" });
 });
 
-test.cb("#http", (t) => {
+test("#http", async (t) => {
   t.plan(3);
   const client = new JSONRPCClient();
 
@@ -110,10 +105,9 @@ test.cb("#http", (t) => {
 
   client._onmessage = (m) => {
     t.is(m, response);
-    t.end();
   };
 
-  client.http(request);
+  await client.http(request);
 });
 
 test("#http fetch error", async (t) => {
@@ -125,7 +119,7 @@ test("#http fetch error", async (t) => {
     async () => {
       await client.http({});
     },
-    { message: "foo" }
+    { message: "foo" },
   );
 });
 
@@ -142,7 +136,7 @@ test("#http json error", async (t) => {
 
   client.on("error", (err) => {
     t.true(err instanceof SyntaxError);
-    t.is(err.message, "Unexpected token o in JSON at position 1");
+    t.is(err.message, "Unexpected token 'o', \"foo\" is not valid JSON");
   });
 
   await client.http({});
@@ -155,26 +149,26 @@ test("#_buildMessage", (t) => {
       client._buildMessage();
     },
     { instanceOf: TypeError },
-    "undefined is not a string"
+    "undefined is not a string",
   );
 
   t.deepEqual(client._buildMessage("foobar"), {
     method: "foobar",
-    ["json-rpc"]: "2.0",
+    "json-rpc": "2.0",
     id: 0,
   });
 
   t.deepEqual(client._buildMessage("method", []), {
     method: "method",
     params: [],
-    ["json-rpc"]: "2.0",
+    "json-rpc": "2.0",
     id: 1,
   });
 
   t.deepEqual(client._buildMessage("method", {}), {
     method: "method",
     params: {},
-    ["json-rpc"]: "2.0",
+    "json-rpc": "2.0",
     id: 2,
   });
 });

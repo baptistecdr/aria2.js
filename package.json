@@ -1,43 +1,38 @@
 {
-  "name": "aria2",
-  "version": "4.1.2",
-  "description": "Library and for aria2, \"The next generation download utility.\"",
-  "homepage": "https://github.com/sonnyp/aria2.js",
-  "bugs": "https://github.com/sonnyp/aria2.js/issues",
+  "name": "@baptistecdr/aria2",
+  "version": "5.0.0-0",
+  "description": "Library for aria2, \"The next generation download utility.\"",
+  "homepage": "https://github.com/baptistecdr/aria2.js",
+  "bugs": "https://github.com/baptistecdr/aria2.js/issues",
   "license": "ISC",
   "type": "module",
-  "main": "./cjs/Aria2.js",
-  "module": "./src/Aria2.js",
-  "author": "Sonny Piers <sonny@fastmail.net>",
-  "keywords": [
-    "aria2",
-    "download",
-    "BitTorrent",
-    "HTTP",
-    "HTTPS",
-    "FTP",
-    "SFTP",
-    "MetaLink",
-    "magnet",
-    "torrent"
-  ],
-  "scripts": {
-    "preversion": "npm test",
-    "lint": "prettier -l **/*.js",
-    "unit": "ava",
-    "test": "npm run unit && npm run lint",
-    "prepublishOnly": "rollup -c rollup.config.js"
+  "exports": {
+    ".": {
+      "browser": "./dist/esm-browser/bundle.js",
+      "import": "./dist/esm/index.js",
+      "default": "./dist/esm/index.js"
+    },
+    "./package.json": "./package.json"
   },
-  "repository": "github:sonnyp/aria2.js",
+  "author": "Sonny Piers <sonny@fastmail.net>, Baptiste C. <11665396+baptistecdr@users.noreply.github.com>",
+  "keywords": ["aria2", "download", "BitTorrent", "HTTP", "HTTPS", "FTP", "SFTP", "MetaLink", "magnet", "torrent"],
+  "scripts": {
+    "lint": "biome check",
+    "lint:fix": "biome check --fix --unsafe",
+    "test": "ava",
+    "build": "rollup -c rollup.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/baptistecdr/aria2.js.git"
+  },
   "devDependencies": {
-    "ava": "^3.15.0",
-    "node-fetch": "^2.6.1",
-    "prettier": "2.3.2",
-    "rollup": "^2.56.3",
-    "rollup-plugin-polyfill-node": "^0.7.0",
-    "ws": "^8.2.0"
+    "@biomejs/biome": "1.9.4",
+    "ava": "6.2.0",
+    "rollup": "4.29.1",
+    "rollup-plugin-polyfill-node": "0.13.0"
   },
   "engines": {
-    "node": ">= 12.4.0"
+    "node": ">= 20"
   }
 }

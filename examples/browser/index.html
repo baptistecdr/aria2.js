@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Aria2 in a browser</title>
+</head>
+<body>
+<h1>Aria2 using HTTP</h1>
+<pre id="raw-result-http"></pre>
+<h1>Aria2 using WebSocket</h1>
+<pre id="raw-result-ws"></pre>
+<script type="module">
+    import Aria2 from '../../dist/esm-browser/bundle.js';
+
+    const serverOptions = {
+        "host": "localhost",
+        "port": 6800,
+        "secure": true,
+        "secret": "",
+        "path": "/jsonrpc",
+    };
+
+    const aria2viaHTTP = new Aria2(serverOptions);
+    try {
+        const response = await aria2viaHTTP.call('getVersion');
+        document.getElementById('raw-result-http').innerText = JSON.stringify(response, null, 2);
+    } catch (error) {
+        document.getElementById('raw-result-http').innerText = JSON.stringify(error, null, 2);
+    }
+
+    const aria2viaWebSocket = new Aria2(serverOptions);
+    try {
+        await aria2viaWebSocket.open();
+        const response = await aria2viaWebSocket.call('getVersion');
+        document.getElementById('raw-result-ws').innerText = JSON.stringify(response, null, 2);
+        await aria2viaWebSocket.close();
+    } catch (error) {
+        document.getElementById('raw-result-ws').innerText = JSON.stringify(error, null, 2);
+    }
+</script>
+</body>
+</html>

@@ -1,8 +1,9 @@
+// biome-ignore lint/style/useNodejsImportProtocol: nodePolyfills cannot polyfill if the module is imported with the node: protocol
 import { EventEmitter } from "events";
 
 import Deferred from "./Deferred.js";
-import promiseEvent from "./promiseEvent.js";
 import JSONRPCError from "./JSONRPCError.js";
+import promiseEvent from "./promiseEvent.js";
 
 class JSONRPCClient extends EventEmitter {
   constructor(options) {
@@ -10,12 +11,7 @@ class JSONRPCClient extends EventEmitter {
     this.deferreds = Object.create(null);
     this.lastId = 0;
 
-    Object.assign(
-      this,
-      { WebSocket: global.WebSocket, fetch: global.fetch.bind(this) },
-      this.constructor.defaultOptions,
-      options
-    );
+    Object.assign(this, this.constructor.defaultOptions, options);
   }
 
   id() {
@@ -23,15 +19,7 @@ class JSONRPCClient extends EventEmitter {
   }
 
   url(protocol) {
-    return (
-      protocol +
-      (this.secure ? "s" : "") +
-      "://" +
-      this.host +
-      ":" +
-      this.port +
-      this.path
-    );
+    return `${protocol + (this.secure ? "s" : "")}://${this.host}:${this.port}${this.path}`;
   }
 
   websocket(message) {
@@ -41,7 +29,7 @@ class JSONRPCClient extends EventEmitter {
         else resolve();
       };
       this.socket.send(JSON.stringify(message), cb);
-      if (global.WebSocket && this.socket instanceof global.WebSocket) cb();
+      if (globalThis.WebSocket && this.socket instanceof globalThis.WebSocket) cb();
     });
   }
 
@@ -67,7 +55,7 @@ class JSONRPCClient extends EventEmitter {
 
   _buildMessage(method, params) {
     if (typeof method !== "string") {
-      throw new TypeError(method + " is not a string");
+      throw new TypeError(`${method} is not a string`);
     }
 
     const message = {
@@ -90,7 +78,8 @@ class JSONRPCClient extends EventEmitter {
     await this._send(message);
 
     return message.map(({ id }) => {
-      const { promise } = (this.deferreds[id] = new Deferred());
+      this.deferreds[id] = new Deferred();
+      const { promise } = this.deferreds[id];
       return promise;
     });
   }
@@ -99,7 +88,8 @@ class JSONRPCClient extends EventEmitter {
     const message = this._buildMessage(method, parameters);
     await this._send(message);
 
-    const { promise } = (this.deferreds[message.id] = new Deferred());
+    this.deferreds[message.id] = new Deferred();
+    const { promise } = this.deferreds[message.id];
 
     return promise;
   }
@@ -108,9 +98,7 @@ class JSONRPCClient extends EventEmitter {
     this.emit("output", message);
 
     const { socket } = this;
-    return socket && socket.readyState === 1
-      ? this.websocket(message)
-      : this.http(message);
+    return socket && socket.readyState === 1 ? this.websocket(message) : this.http(message);
   }
 
   _onresponse({ id, error, result }) {
@@ -148,7 +136,8 @@ class JSONRPCClient extends EventEmitter {
   }
 
   async open() {
-    const socket = (this.socket = new this.WebSocket(this.url("ws")));
+    this.socket = new this.WebSocket(this.url("ws"));
+    const socket = this.socket;
 
     socket.onclose = (...args) => {
       this.emit("close", ...args);
@@ -186,6 +175,8 @@ JSONRPCClient.defaultOptions = {
   port: 80,
   secret: "",
   path: "/jsonrpc",
+  WebSocket: globalThis.WebSocket,
+  fetch: globalThis.fetch.bind(globalThis),
 };
 
 export default JSONRPCClient;

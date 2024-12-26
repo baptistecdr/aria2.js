@@ -1,10 +1,11 @@
 import JSONRPCClient from "./JSONRPCClient.js";
 
 function prefix(str) {
+  let prefixedStr = str;
   if (!str.startsWith("system.") && !str.startsWith("aria2.")) {
-    str = "aria2." + str;
+    prefixedStr = `aria2.${str}`;
   }
-  return str;
+  return prefixedStr;
 }
 
 function unprefix(str) {
@@ -14,7 +15,7 @@ function unprefix(str) {
 
 class Aria2 extends JSONRPCClient {
   addSecret(parameters) {
-    let params = this.secret ? ["token:" + this.secret] : [];
+    let params = this.secret ? [`token:${this.secret}`] : [];
     if (Array.isArray(parameters)) {
       params = params.concat(parameters);
     }
@@ -42,12 +43,7 @@ class Aria2 extends JSONRPCClient {
   }
 
   async batch(calls) {
-    return super.batch(
-      calls.map(([method, ...params]) => [
-        prefix(method),
-        this.addSecret(params),
-      ])
-    );
+    return super.batch(calls.map(([method, ...params]) => [prefix(method), this.addSecret(params)]));
   }
 
   async listNotifications() {
