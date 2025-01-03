@@ -22,7 +22,7 @@ Start aria2 with rpc, example:
 `aria2c --enable-rpc --rpc-listen-all=true --rpc-allow-origin-all`
 
 ```sh
-npm install aria2
+npm install @baptistecdr/aria2
 ```
 
 ### Browser
