@@ -15,7 +15,18 @@
     "./package.json": "./package.json"
   },
   "author": "Sonny Piers <sonny@fastmail.net>, Baptiste C. <11665396+baptistecdr@users.noreply.github.com>",
-  "keywords": ["aria2", "download", "BitTorrent", "HTTP", "HTTPS", "FTP", "SFTP", "MetaLink", "magnet", "torrent"],
+  "keywords": [
+    "aria2",
+    "download",
+    "BitTorrent",
+    "HTTP",
+    "HTTPS",
+    "FTP",
+    "SFTP",
+    "MetaLink",
+    "magnet",
+    "torrent"
+  ],
   "scripts": {
     "lint": "biome check",
     "lint:fix": "biome check --fix --unsafe",

@@ -69,7 +69,7 @@ class JSONRPCClient extends EventEmitter {
   }
 
   async batch(calls) {
-    const promises = [];
+    const _promises = [];
 
     const message = calls.map(([method, params]) => {
       return this._buildMessage(method, params);
