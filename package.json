@@ -38,7 +38,7 @@
     "url": "git+https://github.com/baptistecdr/aria2.js.git"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.0.4",
+    "@biomejs/biome": "2.0.5",
     "ava": "6.4.0",
     "rollup": "4.44.0",
     "rollup-plugin-polyfill-node": "0.13.0"
