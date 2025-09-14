@@ -23,7 +23,7 @@ jobs:
           package-manager-cache: false
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --no-package-lock
 
       - name: Lint
         run: npm run lint
