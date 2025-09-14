@@ -65,7 +65,7 @@ See [main.js](examples/node/main.js) for a complete example.
 node examples/node/main.js
 ```
 
-⚠️ The WebSocket module is in experimental state in Node.js 20.x and 21.x, you need to use the `--experimental-websocket` flag to enable it. See [Node.js WebSocket documentation](https://nodejs.org/dist/latest/docs/api/globals.html#websocket) for more information.
+⚠️ The WebSocket module is in experimental state in Node.js 20.x, you need to use the `--experimental-websocket` flag to enable it. See [Node.js WebSocket documentation](https://nodejs.org/dist/latest/docs/api/globals.html#websocket) for more information.
 
 ## Usage
 
