@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.2.3/schema.json",
   "formatter": {
     "enabled": true,
     "formatWithErrors": false,
@@ -29,6 +29,6 @@
     }
   },
   "files": {
-    "includes": ["**", "!**/dist/**", "!**/node_modules/**", "!**/.yarn/**", "!**/cjs/**"]
+    "includes": ["**", "!**/dist", "!**/node_modules", "!**/.yarn", "!**/cjs"]
   }
 }
