@@ -40,7 +40,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.3.13",
     "ava": "6.4.1",
-    "rollup": "4.57.0",
+    "rollup": "4.57.1",
     "rollup-plugin-polyfill-node": "0.13.0"
   },
   "engines": {
