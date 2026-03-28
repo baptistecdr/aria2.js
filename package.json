@@ -11,6 +11,7 @@
     ".": {
       "browser": "./dist/esm-browser/bundle.js",
       "import": "./dist/esm/index.js",
+      "types": "./dist/index.d.ts",
       "default": "./dist/esm/index.js"
     },
     "./package.json": "./package.json"

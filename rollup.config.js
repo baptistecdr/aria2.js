@@ -25,6 +25,6 @@ export default [
       format: "esm",
     },
     plugins: [dts()],
-    external: ["events"],
+    external: ["node:events"],
   },
 ];
