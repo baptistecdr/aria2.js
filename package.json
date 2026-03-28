@@ -47,6 +47,14 @@
     "rollup-plugin-dts": "6.4.1",
     "rollup-plugin-polyfill-node": "0.13.0"
   },
+  "peerDependencies": {
+    "@types/node": ">=20"
+  },
+  "peerDependenciesMeta": {
+    "@types/node": {
+      "optional": true
+    }
+  },
   "engines": {
     "node": ">= 20"
   }
