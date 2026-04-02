@@ -48,7 +48,7 @@
     "rollup-plugin-polyfill-node": "0.13.0"
   },
   "peerDependencies": {
-    "@types/node": ">=20"
+    "@types/node": "25.5.0"
   },
   "peerDependenciesMeta": {
     "@types/node": {
