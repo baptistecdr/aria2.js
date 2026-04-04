@@ -41,14 +41,14 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.10",
-    "@types/node": "25.5.0",
+    "@types/node": "25.5.2",
     "ava": "7.0.0",
     "rollup": "4.60.1",
     "rollup-plugin-dts": "6.4.1",
     "rollup-plugin-polyfill-node": "0.13.0"
   },
   "peerDependencies": {
-    "@types/node": "25.5.0"
+    "@types/node": "25.5.2"
   },
   "peerDependenciesMeta": {
     "@types/node": {
