@@ -40,7 +40,7 @@
     "url": "git+https://github.com/baptistecdr/aria2.js.git"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.10",
+    "@biomejs/biome": "2.4.11",
     "@types/node": "25.5.2",
     "ava": "7.0.0",
     "rollup": "4.60.1",
