@@ -7,6 +7,11 @@
       "matchDepTypes": ["engines"],
       "matchUpdateTypes": ["pin"],
       "enabled": false
+    },
+    {
+      "matchDepTypes": ["peerDependencies"],
+      "matchUpdateTypes": ["pin"],
+      "enabled": false
     }
   ]
 }
