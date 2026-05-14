@@ -32,8 +32,8 @@
   "scripts": {
     "lint": "biome check",
     "lint:fix": "biome check --fix --unsafe",
-    "test": "ava",
-    "build": "rollup -c rollup.config.js"
+    "test": "node --test test/*.js",
+    "build": "tsc && rollup -c"
   },
   "repository": {
     "type": "git",
@@ -41,11 +41,8 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.15",
-    "@types/node": "25.7.0",
-    "ava": "8.0.0",
     "rollup": "4.60.3",
-    "rollup-plugin-dts": "6.4.1",
-    "rollup-plugin-polyfill-node": "0.13.0"
+    "rollup-plugin-dts": "6.4.1"
   },
   "engines": {
     "node": ">= 22"

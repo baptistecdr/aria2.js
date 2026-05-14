@@ -1,11 +1,32 @@
-// biome-ignore lint/style/useNodejsImportProtocol: nodePolyfills cannot polyfill if the module is imported with the node: protocol
-import { EventEmitter } from "events";
-
-import Deferred from "./Deferred.js";
 import JSONRPCError from "./JSONRPCError.js";
 import promiseEvent from "./promiseEvent.js";
 
-class JSONRPCClient extends EventEmitter {
+// https://github.com/nodejs/node/issues/58918
+if (!globalThis.ErrorEvent) {
+  globalThis.ErrorEvent = class ErrorEvent extends Event {
+    constructor(type, options) {
+      super(type, options);
+      this.error = options?.error;
+    }
+  };
+}
+
+export class JSONRPCEvent extends Event {
+  constructor(type, options) {
+    super(type, options);
+    this.data = options?.data;
+  }
+}
+
+export class JSONRPCNotificationEvent extends Event {
+  constructor(type, options) {
+    super(type, options);
+    this.method = options?.method;
+    this.params = options?.params;
+  }
+}
+
+class JSONRPCClient extends EventTarget {
   constructor(options) {
     super();
     this.deferreds = Object.create(null);
@@ -22,19 +43,12 @@ class JSONRPCClient extends EventEmitter {
     return `${protocol + (this.secure ? "s" : "")}://${this.host}:${this.port}${this.path}`;
   }
 
-  websocket(message) {
-    return new Promise((resolve, reject) => {
-      const cb = (err) => {
-        if (err) reject(err);
-        else resolve();
-      };
-      this.socket.send(JSON.stringify(message), cb);
-      if (globalThis.WebSocket && this.socket instanceof globalThis.WebSocket) cb();
-    });
+  async websocket(message) {
+    this.socket.send(JSON.stringify(message));
   }
 
   async http(message) {
-    const response = await this.fetch(this.url("http"), {
+    const response = await fetch(this.url("http"), {
       method: "POST",
       body: JSON.stringify(message),
       headers: {
@@ -43,14 +57,16 @@ class JSONRPCClient extends EventEmitter {
       },
     });
 
-    response
-      .json()
-      .then((msg) => this._onmessage(msg))
-      .catch((err) => {
-        this.emit("error", err);
-      });
+    let responseJson;
+    try {
+      responseJson = await response.json();
+      this._onmessage(responseJson);
+    } catch (error) {
+      this.dispatchEvent(new ErrorEvent("error", { error }));
+      throw error;
+    }
 
-    return response;
+    return responseJson;
   }
 
   _buildMessage(method, params) {
@@ -69,36 +85,36 @@ class JSONRPCClient extends EventEmitter {
   }
 
   async batch(calls) {
-    const _promises = [];
-
     const message = calls.map(([method, params]) => {
       return this._buildMessage(method, params);
     });
 
-    await this._send(message);
-
-    return message.map(({ id }) => {
-      this.deferreds[id] = new Deferred();
+    const promises = message.map(({ id }) => {
+      this.deferreds[id] = Promise.withResolvers();
       const { promise } = this.deferreds[id];
       return promise;
     });
+
+    await this._send(message);
+
+    return promises;
   }
 
   async call(method, parameters) {
     const message = this._buildMessage(method, parameters);
-    await this._send(message);
 
-    this.deferreds[message.id] = new Deferred();
+    this.deferreds[message.id] = Promise.withResolvers();
     const { promise } = this.deferreds[message.id];
+
+    await this._send(message);
 
     return promise;
   }
 
   async _send(message) {
-    this.emit("output", message);
+    this.dispatchEvent(new JSONRPCEvent("output", { data: message }));
 
-    const { socket } = this;
-    return socket && socket.readyState === 1 ? this.websocket(message) : this.http(message);
+    return this.socket?.readyState === 1 ? this.websocket(message) : this.http(message);
   }
 
   _onresponse({ id, error, result }) {
@@ -114,11 +130,11 @@ class JSONRPCClient extends EventEmitter {
   }
 
   _onnotification({ method, params }) {
-    this.emit(method, params);
+    this.dispatchEvent(new JSONRPCNotificationEvent("notification", { method, params }));
   }
 
   _onmessage(message) {
-    this.emit("input", message);
+    this.dispatchEvent(new JSONRPCEvent("input", { data: message }));
 
     if (Array.isArray(message)) {
       for (const object of message) {
@@ -136,27 +152,27 @@ class JSONRPCClient extends EventEmitter {
   }
 
   async open() {
-    this.socket = new this.WebSocket(this.url("ws"));
-    const socket = this.socket;
+    this.socket = new WebSocket(this.url("ws"));
+    const { socket } = this;
 
-    socket.onclose = (...args) => {
-      this.emit("close", ...args);
+    socket.onclose = () => {
+      this.dispatchEvent(new Event("close"));
     };
     socket.onmessage = (event) => {
       let message;
       try {
         message = JSON.parse(event.data);
-      } catch (err) {
-        this.emit("error", err);
+      } catch (error) {
+        this.dispatchEvent(new ErrorEvent("error", { error }));
         return;
       }
       this._onmessage(message);
     };
-    socket.onopen = (...args) => {
-      this.emit("open", ...args);
+    socket.onopen = () => {
+      this.dispatchEvent(new Event("open"));
     };
-    socket.onerror = (...args) => {
-      this.emit("error", ...args);
+    socket.onerror = (evt) => {
+      this.dispatchEvent(new ErrorEvent("error", { error: evt }));
     };
 
     return promiseEvent(this, "open");
@@ -167,16 +183,14 @@ class JSONRPCClient extends EventEmitter {
     socket.close();
     return promiseEvent(this, "close");
   }
-}
 
-JSONRPCClient.defaultOptions = {
-  secure: false,
-  host: "localhost",
-  port: 80,
-  secret: "",
-  path: "/jsonrpc",
-  WebSocket: globalThis.WebSocket,
-  fetch: globalThis.fetch.bind(globalThis),
-};
+  static defaultOptions = {
+    secure: false,
+    host: "localhost",
+    port: 80,
+    secret: "",
+    path: "/jsonrpc",
+  };
+}
 
 export default JSONRPCClient;

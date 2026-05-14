@@ -1,4 +1,4 @@
-import JSONRPCClient from "./JSONRPCClient.js";
+import JSONRPCClient, { JSONRPCNotificationEvent } from "./JSONRPCClient.js";
 
 function prefix(str) {
   let prefixedStr = str;
@@ -25,7 +25,9 @@ class Aria2 extends JSONRPCClient {
   _onnotification(notification) {
     const { method, params } = notification;
     const event = unprefix(method);
-    if (event !== method) this.emit(event, params);
+    if (event !== method) {
+      this.dispatchEvent(new JSONRPCNotificationEvent(event, { params }));
+    }
     return super._onnotification(notification);
   }
 
@@ -55,16 +57,21 @@ class Aria2 extends JSONRPCClient {
     const methods = await this.call("system.listMethods");
     return methods.map((method) => unprefix(method));
   }
+
+  static prefix;
+
+  static unprefix;
+
+  static defaultOptions = {
+    ...JSONRPCClient.defaultOptions,
+    ...{
+      secure: false,
+      host: "localhost",
+      port: 6800,
+      secret: "",
+      path: "/jsonrpc",
+    },
+  };
 }
-
-Object.assign(Aria2, { prefix, unprefix });
-
-Aria2.defaultOptions = Object.assign({}, JSONRPCClient.defaultOptions, {
-  secure: false,
-  host: "localhost",
-  port: 6800,
-  secret: "",
-  path: "/jsonrpc",
-});
 
 export default Aria2;

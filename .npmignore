@@ -1,10 +1,9 @@
 .github/
 .idea/
 .vscode/
-scripts/
-test/
+dist/types
 src/
-
+test/
 
 .gitignore
 .npmignore
@@ -12,3 +11,4 @@ src/
 biome.json
 renovate.json
 rollup.config.js
+tsconfig.json

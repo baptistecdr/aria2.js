@@ -1,5 +1,4 @@
 import { dts } from "rollup-plugin-dts";
-import nodePolyfills from "rollup-plugin-polyfill-node";
 
 export default [
   {
@@ -7,24 +6,23 @@ export default [
     output: {
       file: "dist/esm/index.js",
       format: "esm",
+      sourcemap: true,
     },
-    external: ["events"],
   },
   {
     input: "src/Aria2.js",
     output: {
       file: "dist/esm-browser/bundle.js",
       format: "esm",
+      sourcemap: true,
     },
-    plugins: [nodePolyfills()],
   },
   {
-    input: "src/Aria2.d.ts",
+    input: "dist/types/Aria2.d.ts",
     output: {
       file: "dist/index.d.ts",
       format: "esm",
     },
     plugins: [dts()],
-    external: ["node:events"],
   },
 ];
