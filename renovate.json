@@ -10,7 +10,6 @@
     },
     {
       "matchDepTypes": ["peerDependencies"],
-      "matchUpdateTypes": ["pin"],
       "enabled": false
     }
   ]
