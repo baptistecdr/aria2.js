@@ -30,10 +30,11 @@
     "torrent"
   ],
   "scripts": {
+    "clean": "npx rimraf dist",
     "lint": "biome check",
     "lint:fix": "biome check --fix --unsafe",
     "test": "node --test test/*.js",
-    "build": "tsc && rollup -c"
+    "build": "npm run clean && tsc && rollup -c"
   },
   "repository": {
     "type": "git",
@@ -41,6 +42,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.15",
+    "rimraf": "6.1.3",
     "rollup": "4.60.4",
     "rollup-plugin-dts": "6.4.1"
   },
