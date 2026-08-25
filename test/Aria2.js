@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import Aria2 from "../src/Aria2.js";
+import JSONRPCError from "../src/JSONRPCError.js";
 import promiseEvent from "../src/promiseEvent.js";
 
 test("#call", (t) => {
@@ -36,6 +37,40 @@ test("#multicall", (t) => {
     ["a", "1", "2"],
     ["b", "1", "2"],
   ]);
+});
+
+test("#multicall unwraps successful results", async (t) => {
+  const aria2 = new Aria2({ secret: "foobar" });
+  aria2._send = () => {};
+
+  const promise = aria2.multicall([
+    ["a", "1"],
+    ["b", "1"],
+  ]);
+  aria2._onresponse({ id: 0, result: [["ok-a"], ["ok-b"]] });
+
+  t.assert.deepStrictEqual(await promise, ["ok-a", "ok-b"]);
+});
+
+test("#multicall throws on fault", async (t) => {
+  const aria2 = new Aria2({ secret: "foobar" });
+  aria2._send = () => {};
+
+  const promise = aria2.multicall([
+    ["a", "1"],
+    ["b", "1"],
+  ]);
+  aria2._onresponse({
+    id: 0,
+    result: [["ok-a"], { faultCode: 1, faultString: "boom" }],
+  });
+
+  await t.assert.rejects(promise, (error) => {
+    t.assert.ok(error instanceof JSONRPCError);
+    t.assert.strictEqual(error.code, 1);
+    t.assert.strictEqual(error.message, "boom");
+    return true;
+  });
 });
 
 test("#batch", (t) => {

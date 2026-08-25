@@ -1,4 +1,5 @@
 import JSONRPCClient, { JSONRPCNotificationEvent } from "./JSONRPCClient.js";
+import JSONRPCError from "./JSONRPCError.js";
 
 function prefix(str) {
   let prefixedStr = str;
@@ -9,8 +10,7 @@ function prefix(str) {
 }
 
 function unprefix(str) {
-  const suffix = str.split("aria2.")[1];
-  return suffix || str;
+  return str.startsWith("aria2.") ? str.slice("aria2.".length) : str;
 }
 
 class Aria2 extends JSONRPCClient {
@@ -41,7 +41,11 @@ class Aria2 extends JSONRPCClient {
         return { methodName: prefix(method), params: this.addSecret(params) };
       }),
     ];
-    return super.call("system.multicall", multi);
+    const results = await super.call("system.multicall", multi);
+    return results.map((result) => {
+      if (Array.isArray(result)) return result[0];
+      throw new JSONRPCError({ code: result.faultCode, message: result.faultString });
+    });
   }
 
   async batch(calls) {

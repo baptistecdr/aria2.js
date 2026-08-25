@@ -1,5 +1,6 @@
 import { mock, test } from "node:test";
 import JSONRPCClient from "../src/JSONRPCClient.js";
+import JSONRPCError from "../src/JSONRPCError.js";
 import promiseEvent from "../src/promiseEvent.js";
 
 test("#id", (t) => {
@@ -254,6 +255,56 @@ test("#send", async (t) => {
   t.mock.method(client, "http", () => {});
 
   client._send(message);
+});
+
+test("#call cleans up the deferred when send fails", async (t) => {
+  const client = new JSONRPCClient();
+  const error = new Error("boom");
+  client._send = async () => {
+    throw error;
+  };
+
+  await t.assert.rejects(client.call("foo"), (err) => err === error);
+  t.assert.deepStrictEqual(Object.keys(client.deferreds), []);
+});
+
+test("#batch cleans up the deferreds when send fails", async (t) => {
+  const client = new JSONRPCClient();
+  const error = new Error("boom");
+  client._send = async () => {
+    throw error;
+  };
+
+  await t.assert.rejects(
+    client.batch([
+      ["foo", []],
+      ["bar", []],
+    ]),
+    (err) => err === error,
+  );
+  t.assert.deepStrictEqual(Object.keys(client.deferreds), []);
+});
+
+test("#call rejects with a JSONRPCError when it times out", async (t) => {
+  const client = new JSONRPCClient({ timeout: 10 });
+  client._send = async () => {};
+
+  await t.assert.rejects(client.call("foo"), (error) => {
+    t.assert.ok(error instanceof JSONRPCError);
+    t.assert.strictEqual(error.code, -32000);
+    return true;
+  });
+  t.assert.deepStrictEqual(Object.keys(client.deferreds), []);
+});
+
+test("#call does not time out once resolved", async (t) => {
+  const client = new JSONRPCClient({ timeout: 1000 });
+  client._send = async () => {};
+
+  const promise = client.call("foo");
+  client._onresponse({ id: 0, result: "ok" });
+
+  t.assert.strictEqual(await promise, "ok");
 });
 
 test("#_onnotification", (t) => {

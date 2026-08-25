@@ -82,6 +82,9 @@ Default options match aria2c defaults and are
 }
 ```
 
+`timeout` is optional (disabled by default). When set, `call()`/`batch()` reject a request with a `JSONRPCError` if no
+response is received within `timeout` milliseconds, regardless of transport.
+
 `secret` is optional and refers
 to [--rpc-secret](https://aria2.github.io/manual/en/html/aria2c.html#cmdoption--rpc-secret). If you define it, it will
 be added to every call for you.

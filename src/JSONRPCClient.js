@@ -84,18 +84,36 @@ class JSONRPCClient extends EventTarget {
     return message;
   }
 
+  _createDeferred(id) {
+    const deferred = Promise.withResolvers();
+    this.deferreds[id] = deferred;
+
+    if (this.timeout) {
+      const timer = setTimeout(() => {
+        this._onresponse({
+          id,
+          error: { code: -32000, message: `Request timed out after ${this.timeout}ms` },
+        });
+      }, this.timeout);
+      deferred.promise.finally(() => clearTimeout(timer)).catch(() => {});
+    }
+
+    return deferred;
+  }
+
   async batch(calls) {
     const message = calls.map(([method, params]) => {
       return this._buildMessage(method, params);
     });
 
-    const promises = message.map(({ id }) => {
-      this.deferreds[id] = Promise.withResolvers();
-      const { promise } = this.deferreds[id];
-      return promise;
-    });
+    const promises = message.map(({ id }) => this._createDeferred(id).promise);
 
-    await this._send(message);
+    try {
+      await this._send(message);
+    } catch (error) {
+      for (const { id } of message) delete this.deferreds[id];
+      throw error;
+    }
 
     return promises;
   }
@@ -103,10 +121,14 @@ class JSONRPCClient extends EventTarget {
   async call(method, parameters) {
     const message = this._buildMessage(method, parameters);
 
-    this.deferreds[message.id] = Promise.withResolvers();
-    const { promise } = this.deferreds[message.id];
+    const { promise } = this._createDeferred(message.id);
 
-    await this._send(message);
+    try {
+      await this._send(message);
+    } catch (error) {
+      delete this.deferreds[message.id];
+      throw error;
+    }
 
     return promise;
   }
