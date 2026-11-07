@@ -10,8 +10,8 @@ and features:
 
 - Node.js and browsers support
 - multiple transports
-    - [HTTP](https://aria2.github.io/manual/en/html/aria2c.html#rpc-interface)
-    - [WebSocket](https://aria2.github.io/manual/en/html/aria2c.html#json-rpc-over-websocket)
+  - [HTTP](https://aria2.github.io/manual/en/html/aria2c.html#rpc-interface)
+  - [WebSocket](https://aria2.github.io/manual/en/html/aria2c.html#json-rpc-over-websocket)
 - promise API
 - no 3rd party dependency
 
@@ -31,14 +31,14 @@ npm install @baptistecdr/aria2
 ### Browser
 
 ```javascript
-import Aria2 from '@baptistecdr/aria2/dist/esm-browser/bundle.js';
+import Aria2 from "@baptistecdr/aria2/dist/esm-browser/bundle.js";
 
 const serverOptions = {
-    "host": "localhost",
-    "port": 6800,
-    "secure": true,
-    "secret": "",
-    "path": "/jsonrpc",
+  host: "localhost",
+  port: 6800,
+  secure: true,
+  secret: "",
+  path: "/jsonrpc",
 };
 
 const aria2 = new Aria2(serverOptions);
@@ -52,11 +52,11 @@ See [main.html](examples/browser/index.html) for a complete example.
 import Aria2 from "@baptistecdr/aria2";
 
 const serverOptions = {
-    host: "localhost",
-    port: 6800,
-    secure: false,
-    secret: "",
-    path: "/jsonrpc",
+  host: "localhost",
+  port: 6800,
+  secure: false,
+  secret: "",
+  path: "/jsonrpc",
 };
 
 const aria2 = new Aria2(serverOptions);
@@ -122,8 +122,8 @@ magnet link.
 
 ```javascript
 const magnet =
-    "magnet:?xt=urn:btih:88594AAACBDE40EF3E2510C47374EC0AA396C08E&dn=bbb_sunflower_1080p_30fps_normal.mp4&tr=udp%3a%2f%2ftracker.openbittorrent.com%3a80%2fannounce&tr=udp%3a%2f%2ftracker.publicbt.com%3a80%2fannounce&ws=http%3a%2f%2fdistribution.bbb3d.renderfarming.net%2fvideo%2fmp4%2fbbb_sunflower_1080p_30fps_normal.mp4";
-const guid = await aria2.call("addUri", [magnet], {dir: "/tmp"});
+  "magnet:?xt=urn:btih:88594AAACBDE40EF3E2510C47374EC0AA396C08E&dn=bbb_sunflower_1080p_30fps_normal.mp4&tr=udp%3a%2f%2ftracker.openbittorrent.com%3a80%2fannounce&tr=udp%3a%2f%2ftracker.publicbt.com%3a80%2fannounce&ws=http%3a%2f%2fdistribution.bbb3d.renderfarming.net%2fvideo%2fmp4%2fbbb_sunflower_1080p_30fps_normal.mp4";
+const guid = await aria2.call("addUri", [magnet], { dir: "/tmp" });
 ```
 
 ### multicall
@@ -134,8 +134,8 @@ results or throw if any of the call failed.
 
 ```javascript
 const multicall = [
-    [methodA, param1, param2],
-    [methodB, param1, param2],
+  [methodA, param1, param2],
+  [methodB, param1, param2],
 ];
 
 const results = await aria2.multicall(multicall);
@@ -148,8 +148,8 @@ as [multicall](#multicall) except it returns an array of promises which gives mo
 
 ```javascript
 const batch = [
-    [methodA, param1, param2],
-    [methodB, param1, param2],
+  [methodA, param1, param2],
+  [methodB, param1, param2],
 ];
 
 const promises = await aria2.batch(batch);
@@ -176,9 +176,9 @@ const notifications = await aria2.listNotifications();
 
 // notifications logger example
 notifications.forEach((notification) => {
-    aria2.addEventListener(notification, ({detail}) => {
-        console.log("aria2", notification, detail);
-    });
+  aria2.addEventListener(notification, ({ detail }) => {
+    console.log("aria2", notification, detail);
+  });
 });
 ```
 
@@ -203,34 +203,34 @@ const methods = await aria2.listMethods();
 ```javascript
 // emitted when the WebSocket is open.
 aria2.addEventListener("open", () => {
-    console.log("aria2", "OPEN");
+  console.log("aria2", "OPEN");
 });
 
 // emitted when the WebSocket is closed.
 aria2.addEventListener("close", () => {
-    console.log("aria2", "CLOSE");
+  console.log("aria2", "CLOSE");
 });
 
 // emitted when error occur.
-aria2.addEventListener("error", ({error}) => {
-    console.error("aria2", "error", error);
+aria2.addEventListener("error", ({ error }) => {
+  console.error("aria2", "error", error);
 });
 
 // emitted for every data sent.
-aria2.addEventListener("input", ({data}) => {
-    console.log("aria2", "IN");
-    console.dir(data);
+aria2.addEventListener("input", ({ data }) => {
+  console.log("aria2", "IN");
+  console.dir(data);
 });
 
 // emitted for every data received.
-aria2.addEventListener("output", ({data}) => {
-    console.log("aria2", "OUT");
-    console.dir(data);
+aria2.addEventListener("output", ({ data }) => {
+  console.log("aria2", "OUT");
+  console.dir(data);
 });
 
 // emitted for every notification received.
-aria2.addEventListener("notification", ({method, params}) => {
-    console.log("aria2", "notification", {method, params});
+aria2.addEventListener("notification", ({ method, params }) => {
+  console.log("aria2", "notification", { method, params });
 });
 ```
 
@@ -238,8 +238,8 @@ Additionally, every [aria2 notifications](https://aria2.github.io/manual/en/html
 emitted as an event. Only available when using WebSocket, see [open](#open).
 
 ```javascript
-aria2.addEventListener("onDownloadStart", ({params: [guid]}) => {
-    console.log("aria2 onDownloadStart", guid);
+aria2.addEventListener("onDownloadStart", ({ params: [guid] }) => {
+  console.log("aria2 onDownloadStart", guid);
 });
 ```
 

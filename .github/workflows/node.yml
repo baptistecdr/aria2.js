@@ -2,9 +2,9 @@ name: Node
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [ 22, 24, 26 ]
+        node: [22, 24, 26]
     steps:
       - name: Clone repository
         uses: actions/checkout@v7.0.1
