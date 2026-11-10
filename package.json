@@ -44,7 +44,7 @@
     "@biomejs/biome": "2.6.6",
     "@typescript/typescript6": "6.0.2",
     "rimraf": "6.1.4",
-    "rollup": "4.68.0",
+    "rollup": "4.68.2",
     "rollup-plugin-dts": "6.5.1"
   },
   "engines": {
